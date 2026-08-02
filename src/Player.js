@@ -75,7 +75,7 @@ export default class Player {
       )
       b.setVelocity(this.facing.x * BULLET_SPEED, this.facing.y * BULLET_SPEED)
       b.setDepth(5)
-      b.setLifespan(900)
+      this.scene.time.delayedCall(900, () => b.destroy())
     } else if (shootHeld && this.ammo === 0) {
       this.startReload()
     }
