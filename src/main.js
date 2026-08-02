@@ -179,6 +179,12 @@ const config = {
   type: Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#14141c',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { x: 0, y: 0 },
+    },
+  },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
