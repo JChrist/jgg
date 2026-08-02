@@ -13,7 +13,7 @@
 | Phase | Task | Title | Size | Status | Notes |
 |------:|----:|-------|:----:|--------|-------|
 | 1 | 1.1 | Scaffold Vite + Phaser 3 project, blank scene boots, GitHub repo created | S | 🟢 done | Repo `JChrist/jgg` (private) created with `gh repo create`; plain JavaScript, no TypeScript |
-| 1 | 1.2 | Player control: move (WASD), aim (mouse), one gun with ammo/reload | M | ⚪ not started | |
+| 1 | 1.2 | Player control: move (WASD), shoot (Space), one gun with ammo/reload | M | 🟢 done | Shot travels in the facing direction (last movement direction) — no mouse, no aiming keys; see §5 control decision |
 | 1 | 1.3 | Basic enemy: chases player, contact damage, dies to bullets | M | ⚪ not started | |
 | 1 | 1.4 | Procedural arena: walls/obstacles + safe spawn points | M | ⚪ not started | Generation must never produce unreachable pickups or blocked spawns |
 | 1 | 1.5 | HUD (health, ammo) + game over / restart flow | S | ⚪ not started | |
@@ -77,6 +77,17 @@ Invariants to preserve as the design evolves:
 ---
 
 ## 5. Decision log
+
+### 2026-08-02 — Facing-based shooting, keyboard only
+
+**Decision:** No mouse aiming anywhere. The gun fires in the player's facing direction, which is the last nonzero movement direction (8-directional). P1 controls: WASD move, Space shoot, R reload. The same scheme will apply to player 2 in phase 2 with a separate key set.
+
+**Why:** A split screen has two players but only one mouse — mouse aiming cannot work for both. Keyboard-only controls keep solo and co-op identical, so phase 2 needs no control redesign. Facing-based shooting chosen over 8-direction aiming keys and rotate-aim (Q/E) for simplicity; the user chose "movement and shoot, shot goes in front".
+
+**Alternatives considered:**
+- 8-direction aim keys (arrows) — precise, but leaves player 2 with a crowded key layout.
+- Auto-aim at nearest enemy — simple, but shooting direction is dictated by enemies; facing-based keeps control with the player.
+- Rotate-aim (Q/E) — slow aiming under pressure.
 
 ### 2026-08-02 — Local-first, upgradeable-to-online framing
 
