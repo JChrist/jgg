@@ -185,6 +185,9 @@ const config = {
       gravity: { x: 0, y: 0 },
     },
   },
+  input: {
+    activePointers: 4,
+  },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
