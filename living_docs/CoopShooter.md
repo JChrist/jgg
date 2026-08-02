@@ -14,7 +14,7 @@
 |------:|----:|-------|:----:|--------|-------|
 | 1 | 1.1 | Scaffold Vite + Phaser 3 project, blank scene boots, GitHub repo created | S | 🟢 done | Repo `JChrist/jgg` (private) created with `gh repo create`; plain JavaScript, no TypeScript |
 | 1 | 1.2 | Player control: move (WASD), shoot (Space), one gun with ammo/reload | M | 🟢 done | Shot travels in the facing direction (last movement direction) — no mouse, no aiming keys; see §5 control decision |
-| 1 | 1.3 | Basic enemy: chases player, contact damage, dies to bullets | M | ⚪ not started | |
+| 1 | 1.3 | Basic enemy: chases player, contact damage, dies to bullets | M | 🟢 done | |
 | 1 | 1.4 | Procedural arena: walls/obstacles + safe spawn points | M | ⚪ not started | Generation must never produce unreachable pickups or blocked spawns |
 | 1 | 1.5 | HUD (health, ammo) + game over / restart flow | S | ⚪ not started | |
 | 2 | 2.1 | Second player input (arrows + other keys); input behind a controller interface | M | ⚪ not started | The upgrade hook: local keyboard is one implementation of `PlayerController`, so a future network player is a second implementation |

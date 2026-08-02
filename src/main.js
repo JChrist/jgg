@@ -1,9 +1,12 @@
 import Phaser from 'phaser'
 import Player from './Player.js'
+import Enemy from './Enemy.js'
 import './style.css'
 
 const WORLD_WIDTH = 1600
 const WORLD_HEIGHT = 1200
+const MAX_ENEMIES = 5
+const INITIAL_ENEMIES = 4
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -17,6 +20,9 @@ class GameScene extends Phaser.Scene {
     g.fillStyle(0xfff2c9, 1)
     g.fillCircle(3, 3, 3)
     g.generateTexture('bullet', 6, 6)
+    g.fillStyle(0xff5566, 1)
+    g.fillCircle(12, 12, 12)
+    g.generateTexture('enemy', 24, 24)
     g.destroy()
 
     this.bullets = this.physics.add.group()
@@ -25,18 +31,59 @@ class GameScene extends Phaser.Scene {
     this.shootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     this.reloadKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
 
+    this.enemies = this.physics.add.group()
+    this.enemyList = []
+    for (let i = 0; i < INITIAL_ENEMIES; i++) {
+      this.spawnEnemy()
+    }
+    this.time.addEvent({
+      delay: 2500,
+      loop: true,
+      callback: () => {
+        if (this.enemyList.length < MAX_ENEMIES) this.spawnEnemy()
+      },
+    })
+
+    this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemySprite) => {
+      bullet.destroy()
+      const enemy = this.enemyBySprite(enemySprite)
+      if (enemy && enemy.hurt()) {
+        this.enemyList.splice(this.enemyList.indexOf(enemy), 1)
+      }
+    })
+
+    this.physics.add.overlap(this.player.sprite, this.enemies, () => {
+      this.player.hurt()
+    })
+
+    this.physics.add.collider(this.enemies, this.enemies)
+
     this.cameras.main.setBackgroundColor('#14141c')
     this.cameras.main.startFollow(this.player.sprite, true, 0.08, 0.08)
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
 
-    this.ammoText = this.add.text(16, 16, '', {
+    this.hudText = this.add.text(16, 16, '', {
       fontFamily: 'monospace',
       fontSize: '18px',
       color: '#ffd',
     }).setScrollFactor(0).setDepth(100)
   }
 
-  update() {
+  spawnEnemy() {
+    const angle = Phaser.Math.FloatBetween(0, Math.PI * 2)
+    const dist = Phaser.Math.Between(400, 600)
+    const x = WORLD_WIDTH / 2 + Math.cos(angle) * dist
+    const y = WORLD_HEIGHT / 2 + Math.sin(angle) * dist
+    const enemy = new Enemy(this, x, y)
+    this.enemies.add(enemy.sprite)
+    this.enemyList.push(enemy)
+  }
+
+  enemyBySprite(sprite) {
+    return this.enemyList.find((e) => e.sprite === sprite)
+  }
+
+  update(time) {
     const dx = (this.cursors.D.isDown ? 1 : 0) - (this.cursors.A.isDown ? 1 : 0)
     const dy = (this.cursors.S.isDown ? 1 : 0) - (this.cursors.W.isDown ? 1 : 0)
     this.player.move(dx, dy)
@@ -45,8 +92,12 @@ class GameScene extends Phaser.Scene {
     const reloadPressed = Phaser.Input.Keyboard.JustDown(this.reloadKey)
     this.player.aimAndShoot(this.bullets, shootHeld, reloadPressed)
 
+    for (const enemy of this.enemyList) {
+      enemy.update(time)
+    }
+
     const ammoLabel = this.player.reloading ? 'reloading' : `ammo ${this.player.ammo}`
-    this.ammoText.setText(ammoLabel)
+    this.hudText.setText(`hp ${this.player.hp}  ${ammoLabel}`)
   }
 }
 

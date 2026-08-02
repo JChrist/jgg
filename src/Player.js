@@ -30,9 +30,13 @@ export default class Player {
     this.ammo = MAG_SIZE
     this.reloading = false
     this.lastFireTime = 0
+    this.hp = 3
+    this.invulnerableUntil = 0
+    this.dead = false
   }
 
   move(dx, dy) {
+    if (this.dead) return
     if (dx !== 0 || dy !== 0) {
       const len = Math.hypot(dx, dy)
       const nx = dx / len
@@ -79,5 +83,26 @@ export default class Player {
   startReload() {
     this.reloading = true
     this.reloadDoneAt = this.scene.time.now + RELOAD_TIME
+  }
+
+  hurt() {
+    const now = this.scene.time.now
+    if (now < this.invulnerableUntil || this.dead) return
+    this.hp -= 1
+    if (this.hp <= 0) {
+      this.hp = 0
+      this.dead = true
+      this.sprite.setAlpha(0.3)
+      this.sprite.setVelocity(0, 0)
+      return
+    }
+    this.invulnerableUntil = now + 700
+    this.scene.tweens.add({
+      targets: this.sprite,
+      alpha: 0.35,
+      duration: 60,
+      yoyo: true,
+      repeat: 6,
+    })
   }
 }
