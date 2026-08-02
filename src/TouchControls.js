@@ -2,6 +2,10 @@ const JOY_RADIUS = 60
 const DEAD_ZONE = 12
 const HALF_W = 480
 
+function inCircle(px, py, centerX, centerY, radius) {
+  return Math.hypot(px - centerX, py - centerY) <= radius
+}
+
 export default class TouchControls {
   constructor(scene) {
     this.scene = scene
@@ -45,7 +49,7 @@ export default class TouchControls {
       }
       return
     }
-    if (Phaser.Geom.Circle.Contains(this.reloadBtn.geom, p.x, p.y)) {
+    if (inCircle(p.x, p.y, this.reloadBtn.x, this.reloadBtn.y, this.reloadBtn.radius)) {
       this.reload = true
       return
     }
@@ -79,7 +83,7 @@ export default class TouchControls {
       this.knobGfx.setVisible(false)
       return
     }
-    if (p.x >= HALF_W && !Phaser.Geom.Circle.Contains(this.reloadBtn.geom, p.x, p.y)) {
+    if (p.x >= HALF_W && !inCircle(p.x, p.y, this.reloadBtn.x, this.reloadBtn.y, this.reloadBtn.radius)) {
       this.shoot = false
     }
   }
