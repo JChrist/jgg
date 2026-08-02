@@ -17,6 +17,7 @@
 | 1 | 1.3 | Basic enemy: chases player, contact damage, dies to bullets | M | 🟢 done | |
 | 1 | 1.4 | Procedural arena: walls/obstacles + safe spawn points | M | 🟢 done | Generation must never produce unreachable pickups or blocked spawns |
 | 1 | 1.5 | HUD (health, ammo) + game over / restart flow | S | 🟢 done | |
+| 1 | 1.6 | Mobile support: scale-to-fit canvas + touch controls (virtual joystick, fire, reload) | M | 🟢 done | User requested after testing on mobile; moved into V1 scope from §4 |
 | 2 | 2.1 | Second player input (arrows + other keys); input behind a controller interface | M | ⚪ not started | The upgrade hook: local keyboard is one implementation of `PlayerController`, so a future network player is a second implementation |
 | 2 | 2.2 | Split screen: two cameras + per-player HUD | M | ⚪ not started | Must hold 60 fps on a typical laptop |
 | 2 | 2.3 | Co-op rules: shared level, spawns, death/revive handling | S | ⚪ not started | |
@@ -72,7 +73,7 @@ Invariants to preserve as the design evolves:
 | Effects polish (particles, screen shake) | V1.1 backlog | Cut from narrow MVP; effects come with sound |
 | Gamepad support | V1.1 backlog | Keyboard only in V1 |
 | Persistent high scores | Out of scope | No backend, no storage in V1; score is session-only |
-| Mobile / touch | Out of scope | Keyboard-first design; no touch input planned |
+| Mobile / touch | Moved to V1 (task 1.6) | User requested mobile testing on 2026-08-02; touch controls (virtual joystick + fire/reload) added to V1 scope, see §5 |
 
 ---
 
@@ -80,6 +81,7 @@ Invariants to preserve as the design evolves:
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-08-02 | Mobile touch support moved into V1 (task 1.6): canvas scaled with `Phaser.Scale.FIT` + `CENTER_BOTH`, virtual joystick on the left half, FIRE and R buttons on the right half | The user tried the game on a phone: screen was black (fixed-size canvas overflowed a small viewport onto a near-black page) and keyboard-only controls were unusable. Touch controls are enabled only on touch-capable devices; desktop keeps keyboard-only. The `PlayerController` abstraction (task 2.1) will treat touch as another input source |
 | 2026-08-02 | Deploy to GitHub Pages; repo `JChrist/jgg` made public; game live at `https://jchrist.dev/jgg/` | GitHub Pages is not available for private repos on the user's plan; the Cloudflare path was rejected because no CF token exists on the machine and generating one is friction. A public repo + Pages workflow deploys with zero new credentials. The `on: push` workflow in `.github/workflows/deploy.yml` builds with Vite (base `/jgg/`) and deploys every push |
 | 2026-08-02 | No live testing during the build; first hands-on test is the deployed build | User reaches the machine via SSH without a working localhost bridge, so live `npm run dev` testing is not practical. Deploy after Phase 1 (solo slice) so the user can play the first playable build; timing of the deploy decision may move up accordingly |
 | 2026-08-02 | Deployment deferred; test via `npm run dev` locally for now | Game still in early phases; static hosting (GitHub Pages or Cloudflare Pages) is a one-command task once the game is demo-worthy |

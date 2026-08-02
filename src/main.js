@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import Player from './Player.js'
 import Enemy from './Enemy.js'
+import TouchControls from './TouchControls.js'
 import { CELL, generateLevel } from './Arena.js'
 import './style.css'
 
@@ -38,6 +39,7 @@ class GameScene extends Phaser.Scene {
     this.bullets = this.physics.add.group()
     const [sx, sy] = this.level.spawn
     this.player = new Player(this, sx * CELL + CELL / 2, sy * CELL + CELL / 2)
+    this.touch = this.sys.game.device.input.touch ? new TouchControls(this) : null
     this.cursors = this.input.keyboard.addKeys('W,A,S,D')
     this.shootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     this.reloadKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
@@ -122,12 +124,22 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time) {
-    const dx = (this.cursors.D.isDown ? 1 : 0) - (this.cursors.A.isDown ? 1 : 0)
-    const dy = (this.cursors.S.isDown ? 1 : 0) - (this.cursors.W.isDown ? 1 : 0)
-    this.player.move(dx, dy)
+    let dx = (this.cursors.D.isDown ? 1 : 0) - (this.cursors.A.isDown ? 1 : 0)
+    let dy = (this.cursors.S.isDown ? 1 : 0) - (this.cursors.W.isDown ? 1 : 0)
+    let shootHeld = this.shootKey.isDown
+    let reloadPressed = Phaser.Input.Keyboard.JustDown(this.reloadKey)
 
-    const shootHeld = this.shootKey.isDown
-    const reloadPressed = Phaser.Input.Keyboard.JustDown(this.reloadKey)
+    if (this.touch) {
+      if (this.touch.moveX !== 0 || this.touch.moveY !== 0) {
+        dx = this.touch.moveX
+        dy = this.touch.moveY
+      }
+      shootHeld = shootHeld || this.touch.shoot
+      reloadPressed = reloadPressed || this.touch.reload
+      this.touch.reload = false
+    }
+
+    this.player.move(dx, dy)
     this.player.aimAndShoot(this.bullets, shootHeld, reloadPressed)
 
     for (const enemy of this.enemyList) {
@@ -166,9 +178,13 @@ class GameScene extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   parent: 'game',
-  width: 960,
-  height: 540,
   backgroundColor: '#14141c',
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 960,
+    height: 540,
+  },
   scene: [GameScene],
 }
 
