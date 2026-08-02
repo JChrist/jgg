@@ -15,7 +15,7 @@
 | 1 | 1.1 | Scaffold Vite + Phaser 3 project, blank scene boots, GitHub repo created | S | 🟢 done | Repo `JChrist/jgg` (private) created with `gh repo create`; plain JavaScript, no TypeScript |
 | 1 | 1.2 | Player control: move (WASD), shoot (Space), one gun with ammo/reload | M | 🟢 done | Shot travels in the facing direction (last movement direction) — no mouse, no aiming keys; see §5 control decision |
 | 1 | 1.3 | Basic enemy: chases player, contact damage, dies to bullets | M | 🟢 done | |
-| 1 | 1.4 | Procedural arena: walls/obstacles + safe spawn points | M | ⚪ not started | Generation must never produce unreachable pickups or blocked spawns |
+| 1 | 1.4 | Procedural arena: walls/obstacles + safe spawn points | M | 🟢 done | Generation must never produce unreachable pickups or blocked spawns |
 | 1 | 1.5 | HUD (health, ammo) + game over / restart flow | S | ⚪ not started | |
 | 2 | 2.1 | Second player input (arrows + other keys); input behind a controller interface | M | ⚪ not started | The upgrade hook: local keyboard is one implementation of `PlayerController`, so a future network player is a second implementation |
 | 2 | 2.2 | Split screen: two cameras + per-player HUD | M | ⚪ not started | Must hold 60 fps on a typical laptop |
@@ -77,6 +77,11 @@ Invariants to preserve as the design evolves:
 ---
 
 ## 5. Decision log
+
+| Date | Decision | Why |
+|---|---|---|
+| 2026-08-02 | No live testing during the build; first hands-on test is the deployed build | User reaches the machine via SSH without a working localhost bridge, so live `npm run dev` testing is not practical. Deploy after Phase 1 (solo slice) so the user can play the first playable build; timing of the deploy decision may move up accordingly |
+| 2026-08-02 | Deployment deferred; test via `npm run dev` locally for now | Game still in early phases; static hosting (GitHub Pages or Cloudflare Pages) is a one-command task once the game is demo-worthy |
 
 ### 2026-08-02 — Facing-based shooting, keyboard only
 

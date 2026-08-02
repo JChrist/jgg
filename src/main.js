@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import Player from './Player.js'
 import Enemy from './Enemy.js'
+import { CELL, generateLevel } from './Arena.js'
 import './style.css'
 
 const WORLD_WIDTH = 1600
@@ -15,6 +16,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+    this.level = generateLevel(1, WORLD_WIDTH / CELL, WORLD_HEIGHT / CELL)
 
     const g = this.make.graphics({ add: false })
     g.fillStyle(0xfff2c9, 1)
@@ -23,10 +25,19 @@ class GameScene extends Phaser.Scene {
     g.fillStyle(0xff5566, 1)
     g.fillCircle(12, 12, 12)
     g.generateTexture('enemy', 24, 24)
+    g.fillStyle(0x2a2a3a, 1)
+    g.fillRect(0, 0, CELL, CELL)
+    g.lineStyle(2, 0x3a3a4e, 1)
+    g.strokeRect(1, 1, CELL - 2, CELL - 2)
+    g.generateTexture('wall', CELL, CELL)
     g.destroy()
 
+    this.buildFloor()
+    this.buildWalls()
+
     this.bullets = this.physics.add.group()
-    this.player = new Player(this, WORLD_WIDTH / 2, WORLD_HEIGHT / 2)
+    const [sx, sy] = this.level.spawn
+    this.player = new Player(this, sx * CELL + CELL / 2, sy * CELL + CELL / 2)
     this.cursors = this.input.keyboard.addKeys('W,A,S,D')
     this.shootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     this.reloadKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
@@ -57,6 +68,9 @@ class GameScene extends Phaser.Scene {
     })
 
     this.physics.add.collider(this.enemies, this.enemies)
+    this.physics.add.collider(this.player.sprite, this.walls)
+    this.physics.add.collider(this.enemies, this.walls)
+    this.physics.add.collider(this.bullets, this.walls, (bullet) => bullet.destroy())
 
     this.cameras.main.setBackgroundColor('#14141c')
     this.cameras.main.startFollow(this.player.sprite, true, 0.08, 0.08)
@@ -69,12 +83,33 @@ class GameScene extends Phaser.Scene {
     }).setScrollFactor(0).setDepth(100)
   }
 
+  buildFloor() {
+    const { grid, gridW, gridH } = this.level
+    const floor = this.add.graphics().setDepth(-10)
+    for (let y = 0; y < gridH; y++) {
+      for (let x = 0; x < gridW; x++) {
+        if (grid[y][x] !== 0) continue
+        floor.fillStyle((x + y) % 2 === 0 ? 0x161622 : 0x14141c, 1)
+        floor.fillRect(x * CELL, y * CELL, CELL, CELL)
+      }
+    }
+  }
+
+  buildWalls() {
+    const { grid, gridW, gridH } = this.level
+    this.walls = this.physics.add.staticGroup()
+    for (let y = 0; y < gridH; y++) {
+      for (let x = 0; x < gridW; x++) {
+        if (grid[y][x] !== 1) continue
+        this.walls.create(x * CELL + CELL / 2, y * CELL + CELL / 2, 'wall')
+      }
+    }
+  }
+
   spawnEnemy() {
-    const angle = Phaser.Math.FloatBetween(0, Math.PI * 2)
-    const dist = Phaser.Math.Between(400, 600)
-    const x = WORLD_WIDTH / 2 + Math.cos(angle) * dist
-    const y = WORLD_HEIGHT / 2 + Math.sin(angle) * dist
-    const enemy = new Enemy(this, x, y)
+    const pool = this.level.enemySpawns
+    const [gx, gy] = pool[Math.floor(Math.random() * pool.length)]
+    const enemy = new Enemy(this, gx * CELL + CELL / 2, gy * CELL + CELL / 2)
     this.enemies.add(enemy.sprite)
     this.enemyList.push(enemy)
   }
