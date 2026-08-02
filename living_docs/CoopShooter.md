@@ -16,7 +16,7 @@
 | 1 | 1.2 | Player control: move (WASD), shoot (Space), one gun with ammo/reload | M | 🟢 done | Shot travels in the facing direction (last movement direction) — no mouse, no aiming keys; see §5 control decision |
 | 1 | 1.3 | Basic enemy: chases player, contact damage, dies to bullets | M | 🟢 done | |
 | 1 | 1.4 | Procedural arena: walls/obstacles + safe spawn points | M | 🟢 done | Generation must never produce unreachable pickups or blocked spawns |
-| 1 | 1.5 | HUD (health, ammo) + game over / restart flow | S | ⚪ not started | |
+| 1 | 1.5 | HUD (health, ammo) + game over / restart flow | S | 🟢 done | |
 | 2 | 2.1 | Second player input (arrows + other keys); input behind a controller interface | M | ⚪ not started | The upgrade hook: local keyboard is one implementation of `PlayerController`, so a future network player is a second implementation |
 | 2 | 2.2 | Split screen: two cameras + per-player HUD | M | ⚪ not started | Must hold 60 fps on a typical laptop |
 | 2 | 2.3 | Co-op rules: shared level, spawns, death/revive handling | S | ⚪ not started | |

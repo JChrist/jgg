@@ -51,6 +51,7 @@ export default class Player {
   }
 
   aimAndShoot(bullets, shootHeld, reloadPressed) {
+    if (this.dead) return
     if (this.reloading) {
       if (this.scene.time.now >= this.reloadDoneAt) {
         this.reloading = false

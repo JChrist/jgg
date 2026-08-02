@@ -51,7 +51,7 @@ class GameScene extends Phaser.Scene {
       delay: 2500,
       loop: true,
       callback: () => {
-        if (this.enemyList.length < MAX_ENEMIES) this.spawnEnemy()
+        if (this.enemyList.length < MAX_ENEMIES && !this.player.dead) this.spawnEnemy()
       },
     })
 
@@ -78,9 +78,12 @@ class GameScene extends Phaser.Scene {
 
     this.hudText = this.add.text(16, 16, '', {
       fontFamily: 'monospace',
-      fontSize: '18px',
+      fontSize: '20px',
       color: '#ffd',
     }).setScrollFactor(0).setDepth(100)
+
+    this.gameOver = false
+    this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
   }
 
   buildFloor() {
@@ -131,8 +134,32 @@ class GameScene extends Phaser.Scene {
       enemy.update(time)
     }
 
-    const ammoLabel = this.player.reloading ? 'reloading' : `ammo ${this.player.ammo}`
-    this.hudText.setText(`hp ${this.player.hp}  ${ammoLabel}`)
+    if (this.player.dead && !this.gameOver) this.showGameOver()
+
+    if (this.gameOver && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
+      this.scene.restart()
+    }
+
+    const hearts = '♥'.repeat(this.player.hp)
+    const ammoLabel = this.player.reloading ? 'reloading…' : `ammo ${this.player.ammo}`
+    this.hudText.setText(`${hearts}\n${ammoLabel}`)
+  }
+
+  showGameOver() {
+    this.gameOver = true
+    this.add.rectangle(480, 270, 960, 540, 0x000000, 0.65)
+      .setScrollFactor(0)
+      .setDepth(200)
+    this.add.text(480, 240, 'GAME OVER', {
+      fontFamily: 'monospace',
+      fontSize: '48px',
+      color: '#ff5566',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(201)
+    this.add.text(480, 320, 'press Enter to restart', {
+      fontFamily: 'monospace',
+      fontSize: '20px',
+      color: '#ffd',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(201)
   }
 }
 
